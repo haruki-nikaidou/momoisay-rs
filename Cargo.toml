@@ -11,3 +11,4 @@ authors = ["Haruki Nikaidou <nharuki@pm.me>"]
 lazy_static = "1.4"
 clap = {version = "4.5", features = ["derive"]}
 crossterm = "0.28"
+rand = "0.8"
