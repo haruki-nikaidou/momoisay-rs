@@ -7,7 +7,9 @@ use crossterm::{
     terminal::{self, Clear, ClearType, EnterAlternateScreen, LeaveAlternateScreen},
 };
 use std::io::{self, stdout, Write};
-use std::time::{Duration, Instant};
+use tokio::time::{Duration as TokioDuration, sleep};
+use tokio::sync::broadcast;
+use std::time::Duration;
 
 const ANIMATION_WIDTH: u16 = 64;
 const ANIMATION_HEIGHT: u16 = 29;
@@ -106,28 +108,42 @@ pub fn cleanup_terminal() -> io::Result<()> {
     Ok(())
 }
 
-pub fn check_for_exit_input() -> io::Result<bool> {
-    if event::poll(Duration::from_millis(10))? {
-        if let Event::Key(key_event) = event::read()? {
-            match key_event.code {
-                KeyCode::Char('q') => return Ok(true),
-                KeyCode::Esc => return Ok(true),
-                KeyCode::Char('c') if key_event.modifiers.contains(KeyModifiers::CONTROL) => return Ok(true),
-                _ => {}
+pub fn spawn_exit_listener(exit_tx: broadcast::Sender<()>) {
+    tokio::spawn(async move {
+        loop {
+            if let Ok(true) = tokio::task::spawn_blocking(|| {
+                if event::poll(Duration::from_millis(10)).unwrap_or(false) {
+                    if let Ok(Event::Key(key_event)) = event::read() {
+                        match key_event.code {
+                            KeyCode::Char('q') => return true,
+                            KeyCode::Esc => return true,
+                            KeyCode::Char('c') if key_event.modifiers.contains(KeyModifiers::CONTROL) => return true,
+                            _ => {}
+                        }
+                    }
+                }
+                false
+            }).await {
+                let _ = exit_tx.send(());
+                break;
             }
+                         sleep(TokioDuration::from_millis(10)).await;
         }
-    }
-    Ok(false)
+    });
 }
 
-pub fn display_animation_once(frames: &AnimatedFrames, text: Option<&str>) -> io::Result<bool> {
+pub async fn display_animation_once(
+    frames: &AnimatedFrames, 
+    text: Option<&str>,
+    mut exit_rx: broadcast::Receiver<()>
+) -> io::Result<bool> {
     let bubble = text.map(|t| create_speech_bubble_with_tail(t, 30));
     let (term_width, term_height) = terminal::size()?;
     let mut stdout = stdout();
     
     for (current_frame, interval) in frames.iter() {
-        // Check for user input at the start of each frame
-        if check_for_exit_input()? {
+        // Check for exit signal at the start of each frame
+        if exit_rx.try_recv().is_ok() {
             return Ok(true); // Exit requested
         }
         
@@ -164,16 +180,16 @@ pub fn display_animation_once(frames: &AnimatedFrames, text: Option<&str>) -> io
         
         stdout.flush()?;
         
-        // Wait for the frame duration
-        let frame_duration = Duration::from_millis(interval);
-        let start_time = Instant::now();
+        // Use tokio::select! to wait for either frame duration or exit signal
+        let frame_duration = TokioDuration::from_millis(interval);
         
-        // Check for input during frame display
-        while start_time.elapsed() < frame_duration {
-            if check_for_exit_input()? {
+        tokio::select! {
+            _ = sleep(frame_duration) => {
+                // Frame duration completed, continue to next frame
+            }
+            _ = exit_rx.recv() => {
                 return Ok(true); // Exit requested
             }
-            std::thread::sleep(Duration::from_millis(10));
         }
     }
     
