@@ -21,7 +21,7 @@
           inherit system;
           overlays = [ rust-overlay.overlays.default ];
         };
-        momoisay = pkgs.rustPlatform.buildRustPackage rec {
+        momoiSay = pkgs.rustPlatform.buildRustPackage rec {
           pname = "momoisay";
           version = "0.1.0";
           src = pkgs.lib.cleanSource ./.;
@@ -37,15 +37,15 @@
       in
       {
         packages = {
-          momoisay = momoisay;
-          default = momoisay;
+          momoisay = momoiSay;
+          default = momoiSay;
         };
         app.default = flake-utils.lib.mkApp {
-          drv = momoisay;
+          drv = momoiSay;
           exe = "momoisay";
         };
         checks = {
-          inherit momoisay;
+          inherit momoiSay;
         };
       }
     );
