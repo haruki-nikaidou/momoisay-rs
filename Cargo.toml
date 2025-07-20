@@ -1,5 +1,5 @@
 [package]
-name = "momoisay-rs"
+name = "momoisay"
 version = "0.1.0"
 edition = "2024"
 description = "Momoisay is a CLI program like cowsay, but instead of a talking cow, it's Saiba Momoi from Blue Archive!"
@@ -9,3 +9,4 @@ authors = ["Haruki Nikaidou <nharuki@pm.me>"]
 
 [dependencies]
 lazy_static = "1.4"
+clap = {version = "4.5", features = ["derive"]}
