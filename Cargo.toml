@@ -10,3 +10,4 @@ authors = ["Haruki Nikaidou <nharuki@pm.me>"]
 [dependencies]
 lazy_static = "1.4"
 clap = {version = "4.5", features = ["derive"]}
+crossterm = "0.28"
