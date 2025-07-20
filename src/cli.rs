@@ -21,6 +21,7 @@ pub enum Commands {
 
     /// Display an animated Momoi (variant 1 or 2)
     Animate {
+        /// The text for Momoi to say
         text: Option<String>,
         /// Animation variant number (1 or 2, default: 1)
         #[arg(short, long, default_value = "1")]
@@ -28,5 +29,8 @@ pub enum Commands {
     },
 
     /// Display Momoi in freestyle mode. Pretty cool for ricing btw.
-    Freestyle,
+    Freestyle {
+        /// The text for Momoi to say
+        text: Option<String>,
+    },
 }
