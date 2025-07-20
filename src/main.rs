@@ -20,7 +20,7 @@ fn main() {
             println!("Text: {:?}", text);
             // TODO: Implement the animate functionality
         }
-        Commands::Freestyle => {
+        Commands::Freestyle { text } => {
             println!("Freestyle command");
             // TODO: Implement the freestyle functionality
         }

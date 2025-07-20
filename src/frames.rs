@@ -1,5 +1,3 @@
-use std::borrow::Cow;
-
 use lazy_static::lazy_static;
 
 const STATIC_FRAME_STR: &str = include_str!("../frames/static-01.txt");
@@ -48,11 +46,11 @@ lazy_static! {
             .collect::<Box<[Frame]>>();
         AnimatedFrames {
             frames: Box::new([
+                frames[2].clone(),
                 frames[3].clone(),
                 frames[4].clone(),
-                frames[5].clone(),
+                frames[0].clone(),
                 frames[1].clone(),
-                frames[2].clone(),
             ]),
             interval_ms: Box::new([150, 75, 150, 150, 75]),
         }
@@ -69,13 +67,13 @@ lazy_static! {
             .collect::<Box<[Frame]>>();
         AnimatedFrames {
             frames: Box::new([
-                frames[2].clone(),
                 frames[1].clone(),
-                frames[5].clone(),
+                frames[0].clone(),
+                frames[4].clone(),
+                frames[2].clone(),
                 frames[3].clone(),
                 frames[4].clone(),
-                frames[5].clone(),
-                frames[1].clone(),
+                frames[0].clone(),
             ]),
             interval_ms: Box::new([70, 70, 70, 1500, 70, 70, 70]),
         }
