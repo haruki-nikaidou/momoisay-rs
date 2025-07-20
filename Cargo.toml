@@ -8,3 +8,4 @@ repository = "https://github.com/haruki-nikaidou/momoisay-rs"
 authors = ["Haruki Nikaidou <nharuki@pm.me>"]
 
 [dependencies]
+lazy_static = "1.4"
