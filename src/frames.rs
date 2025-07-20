@@ -26,7 +26,7 @@ pub struct Frame {
 #[derive(Debug, Clone)]
 pub struct AnimatedFrames {
     pub frames: Box<[Frame]>,
-    pub interval_ms: u64,
+    pub interval_ms: Box<[u64]>,
 }
 
 lazy_static! {
@@ -36,8 +36,8 @@ lazy_static! {
             .map(|line| Cow::Borrowed(&line[0..line.len() - 1]))
             .collect(),
     };
-    pub static ref ANIMATE1_FRAMES: AnimatedFrames = AnimatedFrames {
-        frames: ANIMATE1_FRAMES_STR
+    pub static ref ANIMATE1_FRAMES: AnimatedFrames = {
+        let frames = ANIMATE1_FRAMES_STR
             .iter()
             .map(|frame| Frame {
                 lines: frame
@@ -45,11 +45,20 @@ lazy_static! {
                     .map(|line| Cow::Borrowed(&line[0..line.len() - 1]))
                     .collect(),
             })
-            .collect(),
-        interval_ms: 100,
+            .collect::<Box<[Frame]>>();
+        AnimatedFrames {
+            frames: Box::new([
+                frames[3].clone(),
+                frames[4].clone(),
+                frames[5].clone(),
+                frames[1].clone(),
+                frames[2].clone(),
+            ]),
+            interval_ms: Box::new([150, 75, 150, 150, 75]),
+        }
     };
-    pub static ref ANIMATE2_FRAMES: AnimatedFrames = AnimatedFrames {
-        frames: ANIMATE2_FRAMES_STR
+    pub static ref ANIMATE2_FRAMES: AnimatedFrames = {
+        let frames = ANIMATE2_FRAMES_STR
             .iter()
             .map(|frame| Frame {
                 lines: frame
@@ -57,7 +66,18 @@ lazy_static! {
                     .map(|line| Cow::Borrowed(&line[0..line.len() - 1]))
                     .collect(),
             })
-            .collect(),
-        interval_ms: 100,
+            .collect::<Box<[Frame]>>();
+        AnimatedFrames {
+            frames: Box::new([
+                frames[2].clone(),
+                frames[1].clone(),
+                frames[5].clone(),
+                frames[3].clone(),
+                frames[4].clone(),
+                frames[5].clone(),
+                frames[1].clone(),
+            ]),
+            interval_ms: Box::new([70, 70, 70, 1500, 70, 70, 70]),
+        }
     };
 }

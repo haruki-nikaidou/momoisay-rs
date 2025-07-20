@@ -1,8 +1,8 @@
-mod frames;
 mod cli;
+mod frames;
 
-use clap::Parser;
 use crate::cli::{Cli, Commands};
+use clap::Parser;
 
 fn main() {
     let cli = Cli::parse();
@@ -12,8 +12,12 @@ fn main() {
             println!("Say command with text: {}", text);
             // TODO: Implement the say functionality
         }
-        Commands::Animate { variant_number } => {
+        Commands::Animate {
+            text,
+            variant_number,
+        } => {
             println!("Animate command with variant: {}", variant_number);
+            println!("Text: {:?}", text);
             // TODO: Implement the animate functionality
         }
         Commands::Freestyle => {
