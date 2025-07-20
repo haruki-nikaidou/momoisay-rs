@@ -1,4 +1,5 @@
 use lazy_static::lazy_static;
+use std::sync::Arc;
 
 const STATIC_FRAME_STR: &str = include_str!("../frames/static-01.txt");
 const ANIMATE1_FRAMES_STR: [&str; 5] = [
@@ -18,13 +19,47 @@ const ANIMATE2_FRAMES_STR: [&str; 5] = [
 
 #[derive(Debug, Clone)]
 pub struct Frame {
-    pub lines: Box<[&'static str]>,
+    pub lines: Arc<[&'static str]>,
 }
 
 #[derive(Debug, Clone)]
 pub struct AnimatedFrames {
-    pub frames: Box<[Frame]>,
-    pub interval_ms: Box<[u64]>,
+    pub frames: Arc<[Frame]>,
+    pub interval_ms: Arc<[u64]>,
+}
+
+impl AnimatedFrames {
+    pub fn iter(&self) -> AnimatedFramesIterator {
+        AnimatedFramesIterator {
+            frames: self.frames.clone(),
+            interval_ms: self.interval_ms.clone(),
+            current_frame: 0,
+        }
+    }
+}
+
+pub struct AnimatedFramesIterator {
+    frames: Arc<[Frame]>,
+    interval_ms: Arc<[u64]>,
+    current_frame: usize,
+}
+
+impl Iterator for AnimatedFramesIterator {
+    type Item = (Frame, u64);
+
+    fn next(&mut self) -> Option<Self::Item> {
+        if self.frames.is_empty() || self.interval_ms.is_empty() {
+            return None;
+        }
+        let max_index = self.frames.len().max(self.interval_ms.len()) - 1;
+        if self.current_frame >= max_index {
+            return None;
+        }
+        let frame = self.frames[self.current_frame].clone();
+        let interval = self.interval_ms[self.current_frame];
+        self.current_frame += 1;
+        Some((frame, interval))
+    }
 }
 
 lazy_static! {
@@ -45,14 +80,14 @@ lazy_static! {
             })
             .collect::<Box<[Frame]>>();
         AnimatedFrames {
-            frames: Box::new([
+            frames: Arc::new([
                 frames[2].clone(),
                 frames[3].clone(),
                 frames[4].clone(),
                 frames[0].clone(),
                 frames[1].clone(),
             ]),
-            interval_ms: Box::new([150, 75, 150, 150, 75]),
+            interval_ms: Arc::new([150, 75, 150, 150, 75]),
         }
     };
     pub static ref ANIMATE2_FRAMES: AnimatedFrames = {
@@ -66,7 +101,7 @@ lazy_static! {
             })
             .collect::<Box<[Frame]>>();
         AnimatedFrames {
-            frames: Box::new([
+            frames: Arc::new([
                 frames[1].clone(),
                 frames[0].clone(),
                 frames[4].clone(),
@@ -75,7 +110,7 @@ lazy_static! {
                 frames[4].clone(),
                 frames[0].clone(),
             ]),
-            interval_ms: Box::new([70, 70, 70, 1500, 70, 70, 70]),
+            interval_ms: Arc::new([70, 70, 70, 1500, 70, 70, 70]),
         }
     };
 }
