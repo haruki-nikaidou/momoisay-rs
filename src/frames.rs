@@ -20,7 +20,7 @@ const ANIMATE2_FRAMES_STR: [&str; 5] = [
 
 #[derive(Debug, Clone)]
 pub struct Frame {
-    pub lines: Box<[Cow<'static, str>]>,
+    pub lines: Box<[&'static str]>,
 }
 
 #[derive(Debug, Clone)]
@@ -33,7 +33,7 @@ lazy_static! {
     pub static ref STATIC_FRAME: Frame = Frame {
         lines: STATIC_FRAME_STR
             .lines()
-            .map(|line| Cow::Borrowed(&line[0..line.len() - 1]))
+            .map(|line| &line[0..line.len() - 1])
             .collect(),
     };
     pub static ref ANIMATE1_FRAMES: AnimatedFrames = {
@@ -42,7 +42,7 @@ lazy_static! {
             .map(|frame| Frame {
                 lines: frame
                     .lines()
-                    .map(|line| Cow::Borrowed(&line[0..line.len() - 1]))
+                    .map(|line| &line[0..line.len() - 1])
                     .collect(),
             })
             .collect::<Box<[Frame]>>();
@@ -63,7 +63,7 @@ lazy_static! {
             .map(|frame| Frame {
                 lines: frame
                     .lines()
-                    .map(|line| Cow::Borrowed(&line[0..line.len() - 1]))
+                    .map(|line| &line[0..line.len() - 1])
                     .collect(),
             })
             .collect::<Box<[Frame]>>();
