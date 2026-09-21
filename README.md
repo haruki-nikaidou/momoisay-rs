@@ -50,6 +50,28 @@ Install with flake
 }
 ```
 
+### Prebuilt Binaries
+
+Pushing any git tag publishes stripped release binaries on the
+[releases page](https://github.com/haruki-nikaidou/momoisay-rs/releases),
+together with a `SHA256SUMS` file:
+
+| Target | Notes |
+| --- | --- |
+| `x86_64-unknown-linux-gnu` | dynamically linked; requires glibc >= 2.39 (`readelf --version-info`) |
+| `x86_64-unknown-linux-musl` | statically linked; no libc requirement |
+| `aarch64-unknown-linux-gnu` | dynamically linked; requires glibc >= 2.39 |
+| `aarch64-apple-darwin` | Apple silicon (M series) |
+
+On older distros, use the musl build.
+
+```sh
+TAG=v0.1.0
+TARGET=x86_64-unknown-linux-musl
+tar -xzf "momoisay-${TAG}-${TARGET}.tar.gz"
+install -Dm755 "momoisay-${TAG}-${TARGET}/momoisay" ~/.local/bin/momoisay
+```
+
 ### Manually Build
 
 ```sh
